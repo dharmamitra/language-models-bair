@@ -42,6 +42,5 @@ class ByT5GoogleLarge(ByT5):
 
 
 class ByT5Sanskrit(ByT5):
-    #MODEL_NAME = "buddhist-nlp/byt5-sanskrit"
-    MODEL_NAME = "results/PretrainingByT5SanskritExperiment/5e-04/checkpoint-41000/"
+    MODEL_NAME = "buddhist-nlp/byt5-sanskrit"
     MAX_INPUT_LENGTH = 512
