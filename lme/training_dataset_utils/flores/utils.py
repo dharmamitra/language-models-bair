@@ -140,11 +140,11 @@ def create_inputs_from_examples(
     ]
 
 
-def create_pretrain_input_from_examples(langs: List[str], sentences: List[str], sep: str) -> List[str]:
+def create_pretrain_input_from_examples(sentences: List[str], sep: str) -> List[str]:
     return [
-        f"{lang} {sep} {sentence}"
-        for lang, sentence in
-        zip(langs, sentences)
+        f"{sep} {sentence}"
+        for sentence in
+        sentences
     ]
 
 
@@ -367,7 +367,7 @@ def tokenize_pretrain(pretrain_dataset: Dataset, tokenizer: PreTrainedTokenizerB
     sep = tokenizer.eos_token
 
     def tokenize_fn(examples):
-        inputs = create_pretrain_input_from_examples(examples["lang"], examples["sentences"], sep)
+        inputs = create_pretrain_input_from_examples(examples["text"], sep)
 
         return tokenizer(inputs, max_length=max_seq_len, truncation=True)
 

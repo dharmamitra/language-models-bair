@@ -81,3 +81,40 @@ class FinetuneExperimentBase(ExperimentBase):
         last_checkpoint = get_last_checkpoint(output_dir)
 
         return last_checkpoint is not None
+    
+
+    def run_prediction_only(self, batch_size: int):
+        trainer_cls = self.TRAINER_CLS
+        assert trainer_cls, f"Must override the `TRAINER_CLS` property of {self.name}"
+
+        tokenizer = self.get_tokenizer()
+        data_collator = self.get_data_collator(tokenizer)
+        compute_metrics = self.get_compute_metrics(tokenizer)
+        tokenized_dataset = None
+
+        training_arguments = self.get_training_arguments(batch_size, 0.0)
+        self.print_on_main_process_only(training_arguments, training_arguments)
+
+        if tokenized_dataset is None:
+            tokenized_dataset = self.get_tokenized_dataset(tokenizer, training_arguments)
+            self.print_on_main_process_only(training_arguments, dataset_summary(tokenized_dataset))
+        
+        model = self.get_model(tokenizer)
+        trainer = trainer_cls(
+            model=model,
+            args=training_arguments,
+            train_dataset=tokenized_dataset["train"],
+            eval_dataset=tokenized_dataset["val"],
+            data_collator=data_collator,
+            tokenizer=tokenizer,
+            compute_metrics=compute_metrics,
+        )
+        self.setup_trainer_log_callbacks(trainer)
+
+        resume_from_checkpoint = self.resume_from_checkpoint(training_arguments)
+        trainer.train(resume_from_checkpoint=resume_from_checkpoint)
+
+        predictions = self.get_predictions(trainer, tokenized_dataset)
+
+        self.load_and_save_predictions_dict(trainer, learning_rate, predictions)
+        

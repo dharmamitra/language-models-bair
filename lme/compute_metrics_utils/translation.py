@@ -22,14 +22,21 @@ def get_translation_compute_metrics(tokenizer: PreTrainedTokenizerBase) -> Calla
         chrf_metrics = chrf.compute(
             predictions=predictions,
             references=references,
-            word_order=2,
+            word_order=2,    
         )
+
+        for reference, prediction in zip(references, predictions):
+            print("R: ", reference, "\nP: ", prediction)
+
         bleu_metrics = bleu.compute(predictions=predictions, references=references)
 
         # Remove the "bleu" value and call is score
         # The original bleu score is from 0 to 1, but we scale it up to 0 to 100
         bleu_metrics["score"] = bleu_metrics["bleu"] * 100
         del bleu_metrics["bleu"]
+
+        print("CHRF", chrf_metrics)
+        print("BLEU", bleu_metrics)
 
         def prepend_to_keys(d: Dict[str, Any], prefix: str) -> Dict[str, Any]:
             return {f"{prefix}_{k}": v for k, v in d.items()}
