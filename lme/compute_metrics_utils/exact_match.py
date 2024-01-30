@@ -8,7 +8,8 @@ from transformers.tokenization_utils import PreTrainedTokenizerBase
 
 __all__ = ["get_exact_match_compute_metrics", 
            "get_levenshtein_compute_metrics",
-           "get_uas_las_metrics"]
+           "get_uas_las_metrics",
+           "get_sentence_alignment_score"]
 
 
 def get_exact_match_compute_metrics(tokenizer: PreTrainedTokenizerBase) -> Callable:
@@ -35,8 +36,9 @@ def get_levenshtein_compute_metrics(tokenizer: PreTrainedTokenizerBase) -> Calla
         references = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
         predictions = tokenizer.batch_decode(logits, skip_special_tokens=True)
         distances = []
-        for ref, pred in zip(references, predictions):
-            for sref, spred in zip(ref.split(" # "), pred.split(" # ")):
+        for sref, spred in zip(references, predictions):
+            #for sref, spred in zip(ref.split(" # "), pred.split(" # ")):
+            if 1:
                 sref = sref.strip()
                 spred = spred.strip()
                 if len(sref) >= 2:
@@ -59,7 +61,39 @@ def get_levenshtein_compute_metrics(tokenizer: PreTrainedTokenizerBase) -> Calla
 
     return compute_metrics
 
+def get_sentence_alignment_score(tokenizer: PreTrainedTokenizerBase) -> Callable:
 
+    def compute_metrics(eval_preds):
+        logits, label_ids = eval_preds
+        label_ids[label_ids == -100] = tokenizer.pad_token_id
+
+        references = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
+        predictions = tokenizer.batch_decode(logits, skip_special_tokens=True)
+        perfect_matches = 0
+        total_sentences = 0
+        distances = []
+        for sref, spred in zip(references, predictions):
+            srefs = sref.split("$")
+            spreds = spred.split("$")
+            total_sentences += len(srefs)
+            for pred in spreds:
+                if pred in srefs:
+                    perfect_matches += 1
+
+            current_distance = distance(sref, spred)
+            print(f"ref: {sref}\n pred:{spred}\n dist: {current_distance}\n")
+            distances.append(current_distance)
+        average_distance = sum(distances) / len(distances)
+        sum_of_perfect_matches = perfect_matches / total_sentences
+        print("average_distance", average_distance)
+        print("perfect_matches", sum_of_perfect_matches)
+
+        return {
+            "average_distance": average_distance,
+            "perfect_matches": perfect_matches,
+        }
+
+    return compute_metrics
 
 def get_uas_las_metrics(tokenizer: PreTrainedTokenizerBase) -> Callable:
 

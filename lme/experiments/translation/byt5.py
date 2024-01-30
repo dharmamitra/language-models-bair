@@ -6,6 +6,8 @@ from lme.model_mixins import (
 )
 from lme.training_argument_mixins import MT5FinetuneArgsMixin, MT5PretrainingArgsMixin
 from lme.experiments.translation.sandhi import TranslationSandhi, TranslationSandhiSentence, TranslationSandhiHackathon, TranslationSandhiSighum, TranslationSanskritDP, PretrainingSanskrit, LemmatizeSanskrit, LemmatizeLongSanskrit
+from lme.experiments.translation.sanskrit import TranslationSanskritParagraph
+
 
 class TranslationByT5ExperimentBase(MT5FinetuneArgsMixin, TranslationSandhi, FinetuneExperimentBase):
     pass
@@ -57,8 +59,14 @@ class PretrainingByT5SanskritExperimentBase(MT5PretrainingArgsMixin, Pretraining
 class PretrainingByT5SanskritExperiment(ByT5Sanskrit, PretrainingByT5SanskritExperimentBase):
     pass
 
-class LemmatizeByT5SanskritExperimentBase(MT5FinetuneArgsMixin, LemmatizeLongSanskrit, FinetuneExperimentBase):
+class LemmatizeByT5SanskritExperimentBase(MT5FinetuneArgsMixin, LemmatizeSanskrit, FinetuneExperimentBase):
     pass
 
 class LemmatizeByT5SanskritExperiment(ByT5Sanskrit, LemmatizeByT5SanskritExperimentBase):
+    pass
+
+class TranslationByT5SanskritParagraphExperimentBase(MT5FinetuneArgsMixin, TranslationSanskritParagraph, FinetuneExperimentBase):
+    pass
+
+class TranslationByT5GoogleLargeParagraphExperiment(ByT5GoogleLarge, TranslationByT5SanskritParagraphExperimentBase):
     pass

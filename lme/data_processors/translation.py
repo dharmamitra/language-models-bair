@@ -1,9 +1,12 @@
-from datasets import load_dataset, DatasetDict
+from datasets import load_dataset, DatasetDict, Dataset
+import pandas as pd
 
 from lme.data_processors.abstract import AbstractDataProcessor
 
 
-__all__ = ["TranslationDataProcessor"]
+__all__ = ["TranslationDataProcessor",
+           "TibetanParagraphTranslationProcessor", 
+           "EnglishTibetanParagraphTranslationProcessor"]
 
 
 class TranslationDataProcessor(AbstractDataProcessor):
@@ -56,3 +59,39 @@ class TranslationDataProcessor(AbstractDataProcessor):
         })
 
         return dataset
+
+class TibetanParagraphTranslationProcessor(AbstractDataProcessor):
+    """
+    Data processor for Tibetan paragraph-level translation
+    """
+
+    def load(self) -> DatasetDict:
+        base_path = "/rscratch/nehrdich/data/tib-eng/splits/"
+
+        def load_tsv_as_dataset(file_path: str) -> Dataset:
+            df = pd.read_csv(file_path, delimiter="\t", on_bad_lines="skip", engine="python")
+            return Dataset.from_pandas(df)
+
+        dataset = DatasetDict({
+            "train": load_tsv_as_dataset(base_path + "train.tsv"),
+            "val": load_tsv_as_dataset(base_path + "val_short.tsv"),
+            "test": load_tsv_as_dataset(base_path + "test_short.tsv"),
+        })
+
+        return dataset
+
+
+class EnglishTibetanParagraphTranslationProcessor(AbstractDataProcessor):
+    """
+    Data processor for Tibetan paragraph-level translation
+    """
+
+    def load(self) -> DatasetDict:
+        dataset = load_dataset("buddhist-nlp/tib-en-paragraph", use_auth_token=True)
+        dataset = dataset.map(lambda x: {"input_text": x["target_text"], "target_text": x["input_text"]})
+        dataset = DatasetDict({
+            "train": dataset["train"],
+            "val": dataset["validation"],
+            "test": dataset["test"],
+        })
+        return dataset    

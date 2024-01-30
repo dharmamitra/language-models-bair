@@ -16,6 +16,19 @@ def tokenize_tib_to_eng_translation(translation_dataset: DatasetDict, max_input_
         tokenize_fn, batched=True, remove_columns=["tibetan", "english"], desc="Tokenizing tib to eng translation"
     )
 
+def tokenize_eng_to_tib_translation(translation_dataset: DatasetDict, max_input_length: int, tokenizer: PreTrainedTokenizerBase) -> DatasetDict:
+    def tokenize_fn(examples):
+        model_inputs = tokenizer(examples["english"], max_length=max_input_length, truncation=True)
+
+        labels = tokenizer(text_target=examples["tibetan"], max_length=max_input_length, truncation=True)
+
+        model_inputs["labels"] = labels["input_ids"]
+        return model_inputs
+
+    return translation_dataset.map(
+        tokenize_fn, batched=True, remove_columns=["tibetan", "english"], desc="Tokenizing eng to tib translation"
+    )
+
 
 
 # This is an exact copy of `tokenize_tib_to_eng_translation` unless specified otherwise

@@ -43,11 +43,11 @@ class SandhiLongDataProcessor(AbstractDataProcessor):
     """
 
     def load(self) -> DatasetDict:
-        dataset = load_dataset("chronbmm/sandhi-split-long-pali", use_auth_token=True)
+        dataset = load_dataset("chronbmm/sandhi-split", use_auth_token=True)
         dataset = DatasetDict({
             "train": dataset["train"],
-            "val": dataset["validation_500"],
-            "test": dataset["test_500"],
+            "val": dataset["validation"],
+            "test": dataset["test"],
         })
         return dataset
 
@@ -113,7 +113,7 @@ class SanskritLemmatizerProcessor(AbstractDataProcessor):
     """
 
     def load(self) -> DatasetDict:
-        dataset = load_dataset("chronbmm/sanskrit-stemming-tagging-pali", use_auth_token=True)
+        dataset = load_dataset("chronbmm/sanskrit-stemming-tagging", use_auth_token=True)
         dataset = DatasetDict({
             "train": dataset["train"],
             "val": dataset["validation"],
@@ -127,11 +127,11 @@ class SanskritLemmatizerLongProcessor(AbstractDataProcessor):
     """
 
     def load(self) -> DatasetDict:
-        dataset = load_dataset("chronbmm/sanskrit-stemming-tagging-pali-long", use_auth_token=True)
+        dataset = load_dataset("chronbmm/sanskrit-stemming-tagging", use_auth_token=True)
         dataset = DatasetDict({
             "train": dataset["train"],
-            "val": dataset["validation_long_500"],
-            "test": dataset["test_long_500"],
+            "val": dataset["validation"],
+            "test": dataset["test"],
         })
         return dataset
     

@@ -9,6 +9,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 __all__ = [
     "MBARTManyToOneModelMixin",
     "MBARTModelMixin",
+    "MBARTManyToManyModelMixin",
 ]
 
 
@@ -33,7 +34,7 @@ class MBARTModelMixinBase:
         assert model_name, f"Must override `MODEL_NAME` attribute of {self.name}"
 
         model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-        model.config.forced_bos_token_id = tokenizer.lang_code_to_id['en_XX']
+        model.config.forced_bos_token_id = tokenizer.lang_code_to_id['ko_KR']
         model.config.max_length = max_input_length        
         model._keys_to_ignore_on_save = []
 
@@ -42,6 +43,10 @@ class MBARTModelMixinBase:
 
 class MBARTManyToOneModelMixin(MBARTModelMixinBase):
     MODEL_NAME = "facebook/mbart-large-50-many-to-one-mmt"
+    
+class MBARTManyToManyModelMixin(MBARTModelMixinBase):
+    MODEL_NAME = "facebook/mbart-large-50-many-to-many-mmt"
+    MODEL_NAME = "results/TranslationChineseKoreanMBARTExperiment/checkpoint"
 
 class MBARTModelMixin(MBARTModelMixinBase):
     MODEL_NAME = "facebook/mbart-large-50"
