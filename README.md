@@ -13,7 +13,7 @@ This codebase is forked from Brian Yu (https://github.com/bri25yu/LanguageModelE
 wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
 
 conda env create -f environment.yml
-conda activate LME
+conda activate sktlme
 
 deepspeed run.py
 
