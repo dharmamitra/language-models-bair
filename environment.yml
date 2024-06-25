@@ -1,4 +1,4 @@
-name: LME
+name: sktlme 
 channels:
   - conda-forge
 dependencies:
